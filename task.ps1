@@ -13,9 +13,11 @@ $sshKeyPublicKey = Get-Content "~/.ssh/id_rsa.pub"
 
 $vmImage = "Ubuntu2204"
 $vmSize = "Standard_B1s"
-$webVmName = "web"
-$mngVmName = "jumpbox"
+$webVmName = "webserver"
+$jumpboxVmName = "jumpbox"
 $dnsLabel = "matetask" + (Get-Random -Count 1)
+
+$privateDnsZoneName = "or.nottodo"
 
 
 Write-Host "Creating a resource group $resourceGroupName ..."
@@ -38,8 +40,7 @@ $mngNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Loca
 Write-Host "Creating a virtual network ..."
 $webSubnet = New-AzVirtualNetworkSubnetConfig -Name $webSubnetName -AddressPrefix $webSubnetIpRange -NetworkSecurityGroup $webNsg
 $mngSubnet = New-AzVirtualNetworkSubnetConfig -Name $mngSubnetName -AddressPrefix $mngSubnetIpRange -NetworkSecurityGroup $mngNsg
-New-AzVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName -Location $location -AddressPrefix $vnetAddressPrefix -Subnet $webSubnet,$mngSubnet
-
+$virtualNetwork = New-AzVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName -Location $location -AddressPrefix $vnetAddressPrefix -Subnet $webSubnet,$mngSubnet
 
 Write-Host "Creating a SSH key resource ..."
 New-AzSshKey -Name $sshKeyName -ResourceGroupName $resourceGroupName -PublicKey $sshKeyPublicKey
@@ -53,7 +54,7 @@ New-AzVm `
 -size $vmSize `
 -SubnetName $webSubnetName `
 -VirtualNetworkName $virtualNetworkName `
--SshKeyName $sshKeyName  
+-SshKeyName $sshKeyName 
 $Params = @{
     ResourceGroupName  = $resourceGroupName
     VMName             = $webVmName
@@ -61,22 +62,23 @@ $Params = @{
     Publisher          = 'Microsoft.Azure.Extensions'
     ExtensionType      = 'CustomScript'
     TypeHandlerVersion = '2.1'
-    Settings          = @{fileUris = @('https://raw.githubusercontent.com/mate-academy/azure_task_12_deploy_app_with_vm_extention/main/install-app.sh'); commandToExecute = './install-app.sh'}
+    Settings          = @{fileUris = @('https://raw.githubusercontent.com/mate-academy/azure_task_17_work_with_dns/main/install-app.sh'); commandToExecute = './install-app.sh'}
  }
 Set-AzVMExtension @Params
 
+Write-Host "Creating a public IP ..."
+$publicIP = New-AzPublicIpAddress -Name $jumpboxVmName -ResourceGroupName $resourceGroupName -Location $location -Sku Basic -AllocationMethod Dynamic -DomainNameLabel $dnsLabel
 Write-Host "Creating a management VM ..."
-New-AzPublicIpAddress -Name $mngVmName -ResourceGroupName $resourceGroupName -Location $location -Sku Basic -AllocationMethod Dynamic -DomainNameLabel $dnsLabel
 New-AzVm `
 -ResourceGroupName $resourceGroupName `
--Name $mngVmName `
+-Name $jumpboxVmName `
 -Location $location `
 -image $vmImage `
 -size $vmSize `
 -SubnetName $mngSubnetName `
 -VirtualNetworkName $virtualNetworkName `
--SshKeyName $sshKeyName  `
--PublicIpAddressName $mngVmName
+-SshKeyName $sshKeyName `
+-PublicIpAddressName $jumpboxVmName
+
 
 # Write your code here  -> 
-$Zone = New-AzPrivateDnsZone -Name "to.do" -ResourceGroupName $resourceGroupName

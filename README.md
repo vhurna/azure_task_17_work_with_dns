@@ -1,8 +1,6 @@
-# Create a Virtual Machine with Powershell
+# Work with DNS
 
-VMs are deployed with the script, you can deploy as many VMs as you need just by updating one script variable, but you still need to connect to the VM with SSH and install the app manually. Well, today we are going to fix it! 
-
-In this task you will learn how to use VM extention to automate deployment of your app to the VM. The result script will allow you to deploy a VM and install the todo web app to it without any manuall actions, only by running the Powershell script. 
+One of the first client of your application is a company, called 'ornottodo' - they want to deploy your todo app into their internal network (which is currently in Azure). The challenge here - 'ornottodo' folks want to have it available by the domain name rather than by internal IP, so in this task you will have to learn how to work with DNS in Azure.  
 
 ## How to complete tasks in this module 
 
@@ -58,26 +56,29 @@ If you are a Windows user, before running this command, please also run the foll
 
 ## Requirements
 
-In this task, you will need to write and run a Powershell script, which deploys a virtual machines and uses custom script VM extention to deploy a web app:  
+In this task, you will need to update existing PowerShell script `task.ps1`. The original script deploys 2 virtual machines: 
 
-1. Write your script code to the file `task.ps1` in this repository:
-    
-    - In script, you should assume that you are already logged in to Azure and using correct subscription (don't use commands 'Connect-AzAccount' and 'Set-AzContext', if needed - just run them on your computer before running the script). 
+- `webserver`, used to host the todo web app. It's deployed in a subnet `web`, without public IP.
+- `jumpbox`, used as a dedicated virtual machine for managemen of `webserver`. It is deployed to separate subnet, has public IP, and allows connecting to it through SSH.  
 
-    - Script already have code, which deploys a VM. Update the code so it will deploy a web app from this repo using a custom script VM extention. 
+In this task, you need to deploy a private DNS zone `todo.ornottodo`, create a DNS record in it: 
 
-    - To deploy an extention, use [Set-AzVMExtention](https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/features-linux?tabs=azure-powershell#azure-powershell-1) comandlet. 
+1. Review the script `task.ps1`.  
 
-    - Extention should run a script `install-app.sh`, which should be loaded from your fork of this repo. In your for, the script will be available by the URL: `https://raw.githubusercontent.com/<your-github-username>/azure_task_12_deploy_app_with_vm_extention/main/install-app.sh`
+2. Add deployment of private DNS zone `or.nottodo`. To deploy a private DNS zone, use comandlet [New-AzPrivateDnsZone](https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednszone?view=azps-12.0.0). 
 
-    - Make sure to review and update script `install-app.sh` - it should clone your fork of this repo to the VM. Take a note, that as `install-app.sh` will be downloaded by your VM from the GitHub, you need to commit and push changes to it before running the Powershell code which deploys the extention. 
+3. Don't forget to add linking of newly-created DNS zone to the virtual network, where VMs are deployed - you can do it with comandlet [New-AzPrivateDnsVirtualNetworkLink](https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednsvirtualnetworklink?view=azps-12.0.0). Make sure to enable [auto-registration](https://learn.microsoft.com/en-us/azure/dns/private-dns-autoregistration) feature when creating a link. 
 
-2. When script is ready, run it to deploy resources to your subcription. Make sure that script is working without errors, and that application is available on port 8080 after you run the script. To verify that web application is running, open in a web browser the following URL: `http://<your-public-ip-DNS-name>:8080`.
+4. Add creating of a CNAME record in the private DNS zone - for that use comandlet [New-AzPrivateDnsRecordSet](https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednsrecordset?view=azps-12.0.0). CNAME should point domain `todo.or.nottodo` to the domain, `webserver` virtual machine will get with auto-registration in the private DNS zone. 
 
-3. Run artifacts generation script `scripts/generate-artifacts.ps1`.
+5. When script is ready, run it to deploy resources to your subcription.
 
-4. Test yourself using the script `scripts/validate-artifacts.ps1`.
+6. To test yourself, connect to the `jumbox` VM with SSH, and test with curl, if you can get to the todo web app by it's domain name `todo.or.nottodo` (app will be running on port 8080, so you will need to use the following URL for curl: "http://todo.or.nottodo:8080/"). 
 
-5. Make sure that changes to both `task.ps1` and `result.json` are commited to the repo, and sumbit the solution for a review. 
+7. Run artifacts generation script `scripts/generate-artifacts.ps1`.
 
-6. When solution is validated, delete resources you deployed with the powershell script - you won't need them for the next tasks. 
+8. Test yourself using the script `scripts/validate-artifacts.ps1`.
+
+9. Make sure that changes to both `task.ps1` and `result.json` are commited to the repo, and sumbit the solution for a review. 
+
+10. When solution is validated, delete resources you deployed with the powershell script - you won't need them for the next tasks. 
