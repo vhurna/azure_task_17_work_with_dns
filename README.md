@@ -40,7 +40,7 @@ In this task, you will need to update the existing PowerShell script `task.ps1`.
 - `webserver`, used to host the todo web app. It's deployed in a subnet `web`, without public IP.
 - `jumpbox`, used as a dedicated virtual machine for management of `webserver`. It is deployed to a separate subnet, has a public IP, and allows connecting to it through SSH.  
 
-In this task, you need to deploy a private DNS zone `todo.ornottodo` and create a DNS record in it: 
+In this task, you need to deploy a private DNS zone `todo.or.nottodo` and create a DNS record in it: 
 
 1. Review the script `task.ps1`.  
 
