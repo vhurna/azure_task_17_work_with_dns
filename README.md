@@ -14,7 +14,7 @@ Before completing any task in the module, make sure that you followed all the st
 
 3. In the *“mate-resources”* resource group, create a storage account (any name) and a *“task-artifacts”* container.
 
-4. Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.4) on your computer. All tasks in this module use Powershell 7. To run it in the terminal, execute the following command: 
+4. Install [PowerShell 7](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.4) on your computer. All tasks in this module use PowerShell 7. To run it in the terminal, execute the following command: 
     ```
     pwsh
     ```
@@ -46,7 +46,7 @@ In this task, you need to deploy a private DNS zone `todo.or.nottodo` and create
 
 2. Add deployment of private DNS zone `or.nottodo`. To deploy a private DNS zone, use comandlet [New-AzPrivateDnsZone](https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednszone?view=azps-12.0.0). 
 
-3. Don't forget to add linking of newly-created DNS zone to the virtual network, where VMs are deployed you can do it with comandlet [New-AzPrivateDnsVirtualNetworkLink](https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednsvirtualnetworklink?view=azps-12.0.0). Make sure to enable [auto-registration](https://learn.microsoft.com/en-us/azure/dns/private-dns-autoregistration) feature when creating a link. 
+3. Don't forget to add linking of the newly-created DNS zone to the virtual network, where VMs are deployed. You can do it with comandlet [New-AzPrivateDnsVirtualNetworkLink](https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednsvirtualnetworklink?view=azps-12.0.0). Make sure to enable [auto-registration](https://learn.microsoft.com/en-us/azure/dns/private-dns-autoregistration) feature when creating a link. 
 
 4. Add creating of a `CNAME` record in the private DNS zone — use comandlet [New-AzPrivateDnsRecordSet](https://learn.microsoft.com/en-us/powershell/module/az.privatedns/new-azprivatednsrecordset?view=azps-12.0.0). `CNAME` should point domain `todo.or.nottodo` to the domain, `webserver` virtual machine will get with auto-registration in the private DNS zone. 
 
@@ -60,7 +60,7 @@ In this task, you need to deploy a private DNS zone `todo.or.nottodo` and create
 
 9. Make sure that changes to both `task.ps1` and `result.json` are committed to the repo, and submit the solution for review. 
 
-10. When the solution is validated, delete the resources you deployed with the Powershell script — you won't need them for the next tasks. 
+10. When the solution is validated, delete the resources you deployed with the PowerShell script — you won't need them for the next tasks. 
 
 
 ## How to complete tasks in this module 
