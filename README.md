@@ -63,7 +63,7 @@ In this task, you need to deploy a private DNS zone `todo.or.nottodo` and create
 10. When the solution is validated, delete the resources you deployed with the PowerShell script — you won't need them for the next tasks. 
 
 
-## How to complete tasks in this module 
+## How to Complete Tasks in This Module 
 
 Tasks in this module are relying on 2 PowerShell scripts: 
 
